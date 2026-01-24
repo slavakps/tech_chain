@@ -1,0 +1,7 @@
+from rest_framework.routers import DefaultRouter
+from .views import NetworkNodeViewSet
+
+router = DefaultRouter()
+router.register("network-nodes", NetworkNodeViewSet)
+
+urlpatterns = router.urls
