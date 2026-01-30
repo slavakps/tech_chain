@@ -27,6 +27,7 @@ cd tech-chain
 
 2. Установите зависимости:
 ```
+poetry env use 3.11
 poetry install
 ```
 
