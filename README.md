@@ -31,9 +31,15 @@ poetry env use 3.11
 poetry install
 ```
 
-3. Создайте файл переменных окружения:
+3. Создать файл переменных окружения
+
+Linux / Mac:
 ```
 cp .env.example .env
+```
+Windows:
+```
+copy .env.example .env
 ```
 
 4. Заполните файл `.env`:
