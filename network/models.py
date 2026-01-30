@@ -1,22 +1,13 @@
-from django.db import models
 from django.core.exceptions import ValidationError
-
-class NodeType(models.IntegerChoices):
-    FACTORY = 0, "Завод"
-    RETAIL = 1, "Розничная сеть"
-    ENTREPRENEUR = 2, "ИП"
+from django.db import models
 
 
 class NetworkNode(models.Model):
-    class Meta:
-        verbose_name = "Звено сети"
-        verbose_name_plural = "Звенья сети"
-        ordering = ["created_at"]
+    MAX_LEVEL = 2
 
     name = models.CharField(max_length=255)
 
-    node_type = models.IntegerField(choices=NodeType.choices)
-
+    # Контакты
     email = models.EmailField()
     country = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
@@ -32,53 +23,47 @@ class NetworkNode(models.Model):
     )
 
     debt = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["created_at"]
+
+    def __str__(self):
+        return self.name
 
     @property
     def level(self):
-        if not self.supplier:
-            return 0
-        if not self.supplier.supplier:
-            return 1
-        return 2
+        level = 0
+        supplier = self.supplier
+        while supplier:
+            level += 1
+            supplier = supplier.supplier
+        return level
 
     def clean(self):
-        # 1. Завод не может иметь поставщика
-        if self.node_type == NodeType.FACTORY and self.supplier:
-            raise ValidationError("Завод не может иметь поставщика.")
+        if self.pk and self.supplier_id == self.pk:
+            raise ValidationError("Узел не может быть своим поставщиком.")
 
-        # 2. Проверка глубины (не больше 2 переходов вверх)
         level = 0
-        current_supplier = self.supplier
+        supplier = self.supplier
+        visited = set()
 
-        while current_supplier:
+        while supplier:
+            if supplier.pk in visited:
+                raise ValidationError("Обнаружен цикл поставщиков.")
+            visited.add(supplier.pk)
+
             level += 1
-            if level > 2:
-                raise ValidationError("Превышена допустимая глубина иерархии (максимум 3 уровня).")
-            current_supplier = current_supplier.supplier
+            if level > self.MAX_LEVEL:
+                raise ValidationError("Максимальная глубина сети — 3 уровня.")
 
-        # 3. Проверка циклов
-        current_supplier = self.supplier
-        while current_supplier:
-            if current_supplier == self:
-                raise ValidationError("Обнаружен цикл в иерархии поставщиков.")
-            current_supplier = current_supplier.supplier
+            supplier = supplier.supplier
 
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
 
-    def __str__(self):
-        return self.name
-
-
 class Product(models.Model):
-    class Meta:
-        verbose_name = "Продукт"
-        verbose_name_plural = "Продукты"
-        ordering = ["release_date"]
-
     name = models.CharField(max_length=255)
     model = models.CharField(max_length=255)
     release_date = models.DateField()
@@ -88,6 +73,9 @@ class Product(models.Model):
         related_name="products",
         on_delete=models.CASCADE
     )
+
+    class Meta:
+        ordering = ["release_date"]
 
     def __str__(self):
         return f"{self.name} ({self.model})"
