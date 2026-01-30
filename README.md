@@ -99,8 +99,9 @@ POST http://127.0.0.1:8000/api/token/
 
 ## Требования
 
-- Python 3.12+  
+- Python 3.11–3.12  
 - PostgreSQL 10+  
+- Poetry
 
 ---
 
