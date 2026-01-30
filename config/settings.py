@@ -134,3 +134,4 @@ REST_FRAMEWORK = {
 
 LOGIN_REDIRECT_URL = "/api/network-nodes/"
 LOGOUT_REDIRECT_URL = "/api/network-nodes/"
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
