@@ -1,21 +1,18 @@
-[project]
+[tool.poetry]
 name = "tech-chain"
 version = "0.1.0"
-description = ""
-authors = [
-    {name = "slavakps",email = "you@example.com"}
-]
-package-mode = false
+description = "Electronics retail network platform (test task)"
+authors = ["slavakps <you@example.com>"]
 readme = "README.md"
-requires-python = ">=3.11,<3.13"
-dependencies = [
-    "django (>=5.2,<6.0)",
-    "djangorestframework (>=3.16.1,<4.0.0)",
-    "psycopg2-binary (>=2.9.11,<3.0.0)",
-    "django-filter (>=25.2,<26.0)",
-    "python-dotenv (>=1.2.1,<2.0.0)"
-]
+package-mode = false
 
+[tool.poetry.dependencies]
+python = ">=3.11,<3.13"
+django = "^5.2"
+djangorestframework = "^3.16"
+psycopg2-binary = "^2.9"
+django-filter = "^25.2"
+python-dotenv = "^1.2"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
@@ -34,15 +31,8 @@ exclude = [
 ]
 
 [tool.ruff.lint]
-select = [
-    "E",  # pycodestyle
-    "F",  # pyflakes
-    "I",  # isort
-    "B",  # bugbear
-]
-ignore = [
-    "E203",  # black compatibility
-]
+select = ["E", "F", "I", "B"]
+ignore = ["E203"]
 
 [tool.ruff.format]
 quote-style = "double"
